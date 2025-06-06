@@ -140,15 +140,23 @@
       sound.play();
 
       setTimeout(() => {
-        const game = games[currentIndex % games.length];
+        if (games.length === 0) {
+          document.getElementById('gameTitle').textContent = "🎉 게임 종료!";
+          document.getElementById('gameDescription').textContent = "모든 게임을 완료했습니다!";
+          document.querySelector('.game-desc').style.display = 'block';
+          document.querySelector('.game-explanation').style.display = 'block';
+          return;
+        }
+
+        const index = Math.floor(Math.random() * games.length);
+        const game = games.splice(index, 1)[0]; // 선택한 게임 제거
         document.getElementById('gameTitle').textContent = game.title;
         document.getElementById('gameDescription').textContent = game.desc;
         document.querySelector('.game-desc').style.display = 'block';
         document.querySelector('.game-explanation').style.display = 'block';
-        document.querySelector('.counter').textContent = `${currentIndex + 1}번째 게임`;
         currentIndex++;
         card.classList.remove('flipped');
-      }, 1500);
+      }, 800);
     }
 
     function addGame() {
