@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>술게임 모음</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #f0f0f0;
+      overflow-x: hidden;
+    }
+    .header {
+      position: relative;
+      text-align: center;
+      padding: 1em;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .title {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+    .counter {
+      font-size: 0.9rem;
+      color: gray;
+    }
+    .menu-btn {
+      position: absolute;
+      top: 1em;
+      right: 1em;
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .menu {
+      display: none;
+      position: absolute;
+      top: 3.5em;
+      right: 1em;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 1em;
+      width: 250px;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 10;
+    }
+    .menu.open {
+      display: block;
+    }
+    .game-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 2em auto;
+      width: 200px;
+      height: 300px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      position: relative;
+      perspective: 1000px;
+    }
+    .game-card {
+      width: 100%;
+      height: 100%;
+      transition: transform 1.5s;
+      transform-style: preserve-3d;
+    }
+    .game-card.flipped {
+      transform: rotateY(180deg) scale(1.05);
+    }
+    .game-desc {
+      margin-top: 1em;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      display: none;
+    }
+    .game-explanation {
+      margin-top: 0.5em;
+      font-size: 1rem;
+      color: #555;
+      display: none;
+      text-align: center;
+    }
+    .menu button {
+      margin: 0.5em 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 class="title">술게임 랜덤카드</h1>
+    <div class="counter">1번째 게임</div>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    <div class="menu" id="menu">
+      <h3>게임 리스트</h3>
+      <ul id="gameList"></ul>
+      <input type="text" id="newGameName" placeholder="게임명" />
+      <textarea id="newGameDesc" placeholder="게임 설명"></textarea>
+      <button onclick="addGame()">추가</button>
+      <button onclick="deleteGame()">삭제</button>
+      <button onclick="editGame()">수정</button>
+    </div>
+  </div>
+  <button class="game-btn" onclick="flipCard()">
+    <img src="KakaoTalk_20250602_183242456.png" id="card" class="game-card" alt="게임 카드" />
+  </button>
+  <div class="game-desc" id="gameTitle">게임명</div>
+  <div class="game-explanation" id="gameDescription">게임 설명이 여기에 표시됩니다.</div>
+  <audio id="clickSound" src="소리_2025_05_27_16_24_49_596.mp3"></audio>
+
+  <script>
+    const games = [
+      { title: "러시안 룰렛", desc: "컵 중 하나에만 술이 들어있는 게임" },
+      { title: "진실게임", desc: "질문하고 술 마시기" },
+      { title: "복불복 게임", desc: "랜덤으로 당첨된 사람이 마시는 게임" },
+    ];
+    let currentIndex = 0;
+
+    document.querySelector('.game-desc').style.display = 'none';
+    document.querySelector('.game-explanation').style.display = 'none';
+
+    function toggleMenu() {
+      document.getElementById('menu').classList.toggle('open');
+    }
+
+    function flipCard() {
+      const card = document.getElementById('card');
+      const sound = document.getElementById('clickSound');
+      card.classList.add('flipped');
+      sound.play();
+
+      setTimeout(() => {
+        const game = games[currentIndex % games.length];
+        document.getElementById('gameTitle').textContent = game.title;
+        document.getElementById('gameDescription').textContent = game.desc;
+        document.querySelector('.game-desc').style.display = 'block';
+        document.querySelector('.game-explanation').style.display = 'block';
+        document.querySelector('.counter').textContent = `${currentIndex + 1}번째 게임`;
+        currentIndex++;
+        card.classList.remove('flipped');
+      }, 1500);
+    }
+
+    function addGame() {
+      const name = document.getElementById('newGameName').value;
+      const desc = document.getElementById('newGameDesc').value;
+      if (name && desc) {
+        games.push({ title: name, desc });
+        updateGameList();
+      }
+    }
+
+    function deleteGame() {
+      games.pop();
+      updateGameList();
+    }
+
+    function editGame() {
+      const name = document.getElementById('newGameName').value;
+      const desc = document.getElementById('newGameDesc').value;
+      if (currentIndex > 0 && name && desc) {
+        games[currentIndex - 1] = { title: name, desc };
+        updateGameList();
+      }
+    }
+
+    function updateGameList() {
+      const list = document.getElementById('gameList');
+      list.innerHTML = '';
+      games.forEach((g, i) => {
+        const item = document.createElement('li');
+        item.textContent = `${i + 1}. ${g.title}`;
+        list.appendChild(item);
+      });
+    }
+    updateGameList();
+  </script>
+</body>
+</html>
